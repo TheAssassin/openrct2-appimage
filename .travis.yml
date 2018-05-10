@@ -1,0 +1,16 @@
+language: generic
+sudo: true
+services:
+  - docker
+
+script:
+  - docker run --rm -it -v $(readlink -f .):/ws ubuntu:xenial bash -xc "cd /ws && apt-get update && apt-get install -y libglib2.0-0 binutils libsdl2-2.0-0 libspeexdsp1 libjansson4 libpng12-0 libzip4 libcurl3 libfreetype6 libffi6 libflac8 liblzma5 libogg0 libfontconfig1 file wget && bash -xe build.sh"
+
+after_success:
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh OpenRCT2*.AppImage*
+
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)/
