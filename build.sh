@@ -79,4 +79,4 @@ export LD_LIBRARY_PATH=$(readlink -f appdir/usr/lib/)
 squashfs-root/AppRun appdir/usr/share/applications/openrct2.desktop -bundle-non-qt-libs -appimage $EXTRA_LINUXDEPLOYQT_ARGS
 
 # move AppImage to original location
-mv OpenRCT2*.AppImage "$ORIG_CWD"
+mv OpenRCT2*.AppImage* "$ORIG_CWD"
