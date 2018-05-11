@@ -79,7 +79,8 @@ export LD_LIBRARY_PATH=$(readlink -f appdir/usr/lib/)
 squashfs-root/AppRun appdir/usr/share/applications/openrct2.desktop -bundle-non-qt-libs $EXTRA_LINUXDEPLOYQT_ARGS
 
 # build AppImage with update information
-squashfs-root/usr/bin/appimagetool appdir/ -u "gh-releases-zsync|TheAssassin|openrct2-appimage|continuous|OpenRCT2*.AppImage"
+export PATH=squashfs-root/usr/bin:"$PATH"
+appimagetool appdir/ -u "gh-releases-zsync|TheAssassin|openrct2-appimage|continuous|OpenRCT2*.AppImage"
 
 # move AppImage to original location
 mv OpenRCT2*.AppImage* "$ORIG_CWD"
