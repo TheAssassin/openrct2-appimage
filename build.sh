@@ -80,7 +80,7 @@ squashfs-root/AppRun appdir/usr/share/applications/openrct2.desktop -bundle-non-
 
 # build AppImage with update information
 export PATH=squashfs-root/usr/bin:"$PATH"
-appimagetool appdir/ -u "gh-releases-zsync|TheAssassin|openrct2-appimage|continuous|OpenRCT2*.AppImage"
+appimagetool appdir/ -u "gh-releases-zsync|TheAssassin|openrct2-appimage|continuous|OpenRCT2*.AppImage.zsync"
 
 # move AppImage to original location
 mv OpenRCT2*.AppImage* "$ORIG_CWD"
