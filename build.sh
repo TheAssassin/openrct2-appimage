@@ -72,11 +72,6 @@ chmod +x linuxdeployqt-continuous-x86_64.AppImage
 
 EXTRA_LINUXDEPLOYQT_ARGUMENTS=
 
-# if not building on Travis CI, we skip bundling the copyright files to speed up the build
-if [ "$CI" == "" ]; then
-    EXTRA_LINUXDEPLOYQT_ARGS="-no-copy-copyright-files"
-fi
-
 # make sure moved libraries are found
 export LD_LIBRARY_PATH=$(readlink -f appdir/usr/lib/)
 
