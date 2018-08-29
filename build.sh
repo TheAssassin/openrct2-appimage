@@ -1,11 +1,11 @@
- #! /bin/bash
+#! /bin/bash
 
 set -x
 set -e
 
 TEMP_BASE=/tmp
 
-BUILD_DIR=$(mktemp -d -p "$TEMP_BASE" AppImageUpdate-build-XXXXXX)
+BUILD_DIR=$(mktemp -d -p "$TEMP_BASE" openrct2-appimage-build-XXXXXX)
 
 cleanup () {
     if [ -d "$BUILD_DIR" ]; then
@@ -31,24 +31,17 @@ export VERSION=$(echo "$url" | sed 's/OpenRCT2-/\n/g' | grep linux-x86_64.tar.gz
 mkdir appdir/
 pushd appdir/
 
-# create basic structure
-mkdir -p usr/{bin,lib,share/{applications,icons/hicolor/256x256/apps}}
-
 # put OpenRCT2 binaries and resources into usr/bin/ for now
+mkdir -p usr/bin/
 pushd usr/bin/
 
 wget -O- "$url" | tar xz --strip-components=1
 
-# move libraries in usr/lib/
-mv *.so* ../lib/
-
+popd
 popd
 
-# install desktop file and icons
-pushd usr/share/
-
 # create desktop file
-cat > applications/openrct2.desktop <<EOF
+cat > openrct2.desktop <<EOF
 [Desktop Entry]
 Name=OpenRCT2
 Icon=openrct2
@@ -58,29 +51,17 @@ Categories=Game;
 EOF
 
 # download icon
-wget https://github.com/OpenRCT2/OpenRCT2/raw/develop/resources/logo/icon_x256.png -O icons/hicolor/256x256/apps/openrct2.png
+wget https://github.com/OpenRCT2/OpenRCT2/raw/develop/resources/logo/icon_x256.png -O openrct2.png
 
-popd
-popd
+# download linuxdeploy
+wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
 
-# download linuxdeployqt
-wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+chmod +x linuxdeploy*-x86_64.AppImage
 
-# extract AppImage to be able to run this script in a standard Docker container (which doesn't provide FUSE)
-chmod +x linuxdeployqt-continuous-x86_64.AppImage
-./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
-
-EXTRA_LINUXDEPLOYQT_ARGUMENTS=
-
-# make sure moved libraries are found
-export LD_LIBRARY_PATH=$(readlink -f appdir/usr/lib/)
-
-# bundle libraries with linuxdeployqt and generate AppImage
-squashfs-root/AppRun appdir/usr/share/applications/openrct2.desktop -bundle-non-qt-libs $EXTRA_LINUXDEPLOYQT_ARGS
-
-# build AppImage with update information
-export PATH=squashfs-root/usr/bin:"$PATH"
-appimagetool appdir/ -u "gh-releases-zsync|TheAssassin|openrct2-appimage|continuous|OpenRCT2*.AppImage.zsync"
+export UPD_INFO="gh-releases-zsync|TheAssassin|openrct2-appimage|continuous|OpenRCT2*.AppImage.zsync"
+#export LD_LIBRARY_PATH=appdir/usr/bin/usr/lib
+#bash
+./linuxdeploy-x86_64.AppImage --appimage-extract-and-run --appdir appdir -i openrct2.png -d openrct2.desktop --output appimage
 
 # move AppImage to original location
 mv OpenRCT2*.AppImage* "$ORIG_CWD"
